@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#123b35">
+  <meta name="description" content="Calcula y envía tu solicitud de viáticos EDOMEX–Toluca C5.">
+  <title>Solicitud de viáticos · EDOMEX–Toluca C5</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
+  <script defer src="./config.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Viáticos, inicio"><span class="brand-icon" aria-hidden="true">v.</span> viáticos<span class="brand-dot">/</span></a>
+    <span class="topbar-caption">INTELLIGENCE &amp; TELECOM TECHNOLOGIES</span>
+  </header>
+
+  <main class="page">
+    <div class="intro">
+      <h1>Solicitud de viáticos</h1>
+      <p>Elige la plantilla y los días para generar tu correo.</p>
+    </div>
+
+    <form id="request-form">
+      <div class="workspace">
+        <section class="card settings" aria-labelledby="details-heading">
+          <div class="section-heading"><span class="step">01</span><h2 id="details-heading">Configura tu solicitud</h2></div>
+          <div class="route"><span class="route-marker" aria-hidden="true"></span><div><span class="small-label">DESTINO / PROYECTO</span><strong>EDOMEX – Toluca C5</strong></div></div>
+
+          <label for="message-template">Plantilla del correo</label>
+          <select id="message-template" name="message-template" required aria-describedby="template-help">
+            <option value="original">1. Solicitud original</option>
+            <option value="card-pending">2. Tarjeta de viáticos en trámite</option>
+          </select>
+          <p class="field-help" id="template-help">Solicitud habitual de viáticos.</p>
+
+          <label for="days">Cantidad de días</label>
+          <div class="days-control">
+            <button id="decrease-days" type="button" aria-label="Disminuir un día">−</button>
+            <input id="days" name="days" type="number" min="1" max="365" step="1" value="5" required aria-describedby="days-help">
+            <button id="increase-days" type="button" aria-label="Aumentar un día">+</button>
+          </div>
+          <p class="field-help" id="days-help">De 1 a 365 días. Los importes se actualizan al instante.</p>
+
+          <div class="breakdown">
+            <div class="breakdown-heading"><h3>Desglose de viáticos</h3><span id="days-summary">5 días</span></div>
+            <div class="expense"><div><strong>Alimentos</strong><small>$350.00 MXN / día</small></div><span id="food-total">$1,750.00 MXN</span></div>
+            <div class="expense"><div><strong>Traslado local</strong><small>$800.00 MXN / día</small></div><span id="transport-total">$4,000.00 MXN</span></div>
+            <div class="expense"><div><strong>Autobús</strong><small>$180.00 MXN / día</small></div><span id="bus-total">$900.00 MXN</span></div>
+            <div class="grand-total"><div><span>Total de la solicitud</span><small>Tarifa diaria: $1,330.00 MXN</small></div><strong id="grand-total">$6,650.00 MXN</strong></div>
+          </div>
+        </section>
+
+        <section class="card preview" aria-labelledby="preview-heading">
+          <div class="section-heading"><span class="step">02</span><h2 id="preview-heading">Revisa tu correo</h2><span class="preview-badge">Vista previa</span></div>
+          <div class="preview-subject">
+            <span>Asunto</span>
+            <h3 id="email-subject">SOLICITUD DE VIATICOS EDOMEX-TOLUCA C5</h3>
+          </div>
+          <div class="email-header">
+            <div><span>Para</span><strong id="preview-recipient">erangel@intt2.com</strong></div>
+            <div><span>CC</span><strong id="preview-cc">fromo@intt2.com, salarcon@intt2.com</strong></div>
+          </div>
+          <p id="preview-error" class="preview-help" hidden>Ingresa una cantidad entera de días entre 1 y 365 para generar el correo.</p>
+          <div id="email-preview"></div>
+          <div class="preview-footer"><span aria-hidden="true">↻</span> Se enviará la plantilla elegida con los importes de los días seleccionados.</div>
+        </section>
+      </div>
+
+      <div class="send-panel">
+        <p><strong>Todo listo para enviar.</strong><span>El correo se enviará directamente mediante EmailJS.</span></p>
+        <button class="send-button" id="send-button" type="submit"><span class="send-icon" aria-hidden="true">↗</span><span id="send-label">Generar y Enviar Correo Directamente</span><span class="spinner" aria-hidden="true"></span></button>
+      </div>
+      <div id="status" class="status" role="alert" aria-atomic="true" hidden></div>
+    </form>
+    <noscript><p class="status error">Activa JavaScript para calcular los viáticos y enviar el correo.</p></noscript>
+    <footer class="page-footer"><span>EINAR ULISES ARENAS HERNÁNDEZ</span><span>Importes en pesos mexicanos · MXN</span></footer>
+  </main>
+</body>
+</html>
