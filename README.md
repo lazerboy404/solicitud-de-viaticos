@@ -70,9 +70,9 @@ La vista previa y el envío comparten el mismo HTML: no hay que mantener dos dis
 1. En **Plantilla del correo**, elige **1. Solicitud original** o **2. Tarjeta de viáticos en trámite**.
 2. La primera usa el mensaje habitual. La segunda añade, después de los importes, el aviso: “Hago la mención de que aún no cuento con la tarjeta de viáticos debido a que se encuentra en trámite, para que lo puedan considerar en el método de pago de esta solicitud.”
 3. Selecciona los días y revisa el correo con formato. Los importes de ambas opciones se calculan automáticamente; los de ejemplo para cinco días no son valores fijos.
-4. Pulsa **Generar y Enviar Correo Directamente**. Se envía la opción elegida y el selector se bloquea mientras se procesa.
+4. Pulsa **Generar y Enviar Correo Directamente**. Aparece una confirmación con la plantilla, los días y el total. **Cancelar** o la tecla **Esc** cierran la confirmación sin enviar. Solo **Sí, enviar correo** realiza el envío; los controles se bloquean mientras se procesa.
 
-Ambas opciones usan el mismo asunto, destinatario principal, dos copias y firma de colores. La vista previa es de solo lectura. Al recargar se selecciona la solicitud original. Solo necesitas una plantilla de EmailJS: la aplicación envía cualquiera de los dos mensajes mediante `{{{message_html}}}`.
+Ambas opciones usan el mismo asunto, destinatario principal, dos copias y firma de colores. La vista previa es de solo lectura. Al abrir o recargar, la aplicación comienza con **1 día** y la solicitud original. Solo necesitas una plantilla de EmailJS: la aplicación envía cualquiera de los dos mensajes mediante `{{{message_html}}}`.
 
 ## 3. Agregar tus tres valores
 
@@ -106,7 +106,7 @@ Abre `http://localhost:5500`. Necesitas Internet para cargar EmailJS y enviar; l
 3. Selecciona **5 días**. Debe mostrar **$1,750.00 MXN**, **$4,000.00 MXN**, **$900.00 MXN** y total **$6,650.00 MXN**.
 4. Revisa la vista previa y presiona **Generar y Enviar Correo Directamente**.
 5. Mientras se procesa, el botón indica **Enviando...** y se bloquean los controles para evitar envíos simultáneos y cambios durante el envío.
-6. Aparecerá una alerta dentro de la página con el resultado. Comprueba el correo recibido y la carpeta de spam, además del historial del panel EmailJS. Una respuesta exitosa confirma que EmailJS aceptó la solicitud; la entrega final depende del proveedor.
+6. Aparecerá una notificación emergente con el resultado, que puedes cerrar con la X. El mensaje también queda visible debajo del formulario. Comprueba el correo recibido y la carpeta de spam, además del historial del panel EmailJS. Una respuesta exitosa confirma que EmailJS aceptó la solicitud; la entrega final depende del proveedor.
 
 La aplicación acepta de 1 a 365 días enteros y valida cantidades fuera de rango antes del envío. El destinatario y las copias son de solo lectura y se toman de `MAIL_RECIPIENTS` en `config.js`. Si faltan los valores de configuración, se muestra un mensaje para completarlos. EmailJS debe tener `{{cc_email}}` en el campo Cc para procesar las copias.
 

@@ -79,6 +79,31 @@ h3 { margin: 0; font-size: 12px; font-weight: 600; }
 .status { padding: 16px 20px; border-radius: 9px; margin-top: 16px; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
 .status.success { color: #1b603d; background: #e6f2e9; border: 1px solid #c8dfce; }
 .status.error { color: #8d362d; background: #fff0ed; border: 1px solid #f2cdc4; }
+.confirmation { width: min(460px, calc(100% - 32px)); max-height: calc(100dvh - 40px); padding: 28px; border: 1px solid var(--border); border-radius: 18px; color: var(--ink); background: var(--paper); box-shadow: 0 24px 80px #183a3433; }
+.confirmation::backdrop { background: #102b2566; backdrop-filter: blur(4px); }
+.confirmation-icon { display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 18px; border-radius: 13px; color: var(--green); background: #edf4e6; font-size: 27px; }
+.confirmation h2 { font-family: 'Manrope', system-ui, sans-serif; font-size: 22px; }
+.confirmation > p { margin: 12px 0 20px; font-size: 13px; line-height: 1.7; color: var(--muted); }
+.confirmation-summary { margin: 0 0 24px; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: #f6f8f3; }
+.confirmation-summary > div { display: flex; justify-content: space-between; align-items: baseline; gap: 18px; font-size: 12px; line-height: 1.6; }
+.confirmation-summary > div + div { margin-top: 10px; }
+.confirmation-summary dt { color: var(--muted); }
+.confirmation-summary dd { margin: 0; text-align: right; font-weight: 600; }
+.confirmation-summary > div:last-child { border-top: 1px solid var(--border); padding-top: 10px; }
+.confirmation-summary > div:last-child dd { font-size: 19px; }
+.confirmation-actions { display: flex; gap: 10px; }
+.confirmation-actions button { flex: 1; min-width: 0; }
+.secondary-button { border: 1px solid #dbe2d8; border-radius: 9px; background: white; color: var(--ink); font-size: 12px; padding: 14px; }
+.secondary-button:hover { background: #f0f4ec; }
+.notification { position: fixed; right: 24px; bottom: 24px; z-index: 100; display: flex; align-items: flex-start; gap: 12px; width: min(440px, calc(100% - 32px)); padding: 20px; border: 1px solid #c8dfce; border-radius: 14px; background: #f4fbf4; color: #1b603d; box-shadow: 0 12px 40px #183a3426; }
+.notification[hidden] { display: none; }
+.notification-icon { display: grid; place-items: center; flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: #dcefdc; font-size: 19px; }
+.notification strong { display: block; margin: 3px 0 6px; font-size: 14px; }
+.notification p { margin: 0; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.notification > button { flex-shrink: 0; margin-left: auto; border: 0; padding: 0 4px; background: transparent; color: inherit; font-size: 24px; line-height: 1; }
+.notification.error { background: #fff7f4; color: #8d362d; border-color: #f2cdc4; }
+.notification.error .notification-icon { background: #fbe3dc; }
+@media (max-width: 480px) { .confirmation { padding: 22px; } .notification { right: 16px; bottom: 16px; padding: 16px; } .confirmation-actions .send-button { font-size: 11px; padding-inline: 10px; } }
 .page-footer { display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid var(--border); margin-top: 36px; padding-top: 22px; font-size: 9px; letter-spacing: .5px; color: #8e988b; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 @media (max-width: 960px) { .page { padding: 24px; } .topbar { padding-inline: 24px; } .workspace { gap: 16px; grid-template-columns: minmax(290px, .9fr) minmax(0, 1fr); } .settings { padding: 20px; } .preview .section-heading { padding: 20px 20px 0; } .preview-badge { display: none; } .send-panel { padding: 20px; } .send-panel p { max-width: 230px; } .send-button { padding-inline: 15px; } }

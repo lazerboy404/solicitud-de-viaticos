@@ -40,17 +40,17 @@
           <label for="days">Cantidad de días</label>
           <div class="days-control">
             <button id="decrease-days" type="button" aria-label="Disminuir un día">−</button>
-            <input id="days" name="days" type="number" min="1" max="365" step="1" value="5" required aria-describedby="days-help">
+            <input id="days" name="days" type="number" min="1" max="365" step="1" value="1" autocomplete="off" required aria-describedby="days-help">
             <button id="increase-days" type="button" aria-label="Aumentar un día">+</button>
           </div>
           <p class="field-help" id="days-help">De 1 a 365 días. Los importes se actualizan al instante.</p>
 
           <div class="breakdown">
-            <div class="breakdown-heading"><h3>Desglose de viáticos</h3><span id="days-summary">5 días</span></div>
-            <div class="expense"><div><strong>Alimentos</strong><small>$350.00 MXN / día</small></div><span id="food-total">$1,750.00 MXN</span></div>
-            <div class="expense"><div><strong>Traslado local</strong><small>$800.00 MXN / día</small></div><span id="transport-total">$4,000.00 MXN</span></div>
-            <div class="expense"><div><strong>Autobús</strong><small>$180.00 MXN / día</small></div><span id="bus-total">$900.00 MXN</span></div>
-            <div class="grand-total"><div><span>Total de la solicitud</span><small>Tarifa diaria: $1,330.00 MXN</small></div><strong id="grand-total">$6,650.00 MXN</strong></div>
+            <div class="breakdown-heading"><h3>Desglose de viáticos</h3><span id="days-summary">1 día</span></div>
+            <div class="expense"><div><strong>Alimentos</strong><small>$350.00 MXN / día</small></div><span id="food-total">$350.00 MXN</span></div>
+            <div class="expense"><div><strong>Traslado local</strong><small>$800.00 MXN / día</small></div><span id="transport-total">$800.00 MXN</span></div>
+            <div class="expense"><div><strong>Autobús</strong><small>$180.00 MXN / día</small></div><span id="bus-total">$180.00 MXN</span></div>
+            <div class="grand-total"><div><span>Total de la solicitud</span><small>Tarifa diaria: $1,330.00 MXN</small></div><strong id="grand-total">$1,330.00 MXN</strong></div>
           </div>
         </section>
 
@@ -74,10 +74,29 @@
         <p><strong>Todo listo para enviar.</strong><span>El correo se enviará directamente mediante EmailJS.</span></p>
         <button class="send-button" id="send-button" type="submit"><span class="send-icon" aria-hidden="true">↗</span><span id="send-label">Generar y Enviar Correo Directamente</span><span class="spinner" aria-hidden="true"></span></button>
       </div>
-      <div id="status" class="status" role="alert" aria-atomic="true" hidden></div>
+      <div id="status" class="status" hidden></div>
     </form>
     <noscript><p class="status error">Activa JavaScript para calcular los viáticos y enviar el correo.</p></noscript>
     <footer class="page-footer"><span>EINAR ULISES ARENAS HERNÁNDEZ</span><span>Importes en pesos mexicanos · MXN</span></footer>
   </main>
+  <dialog id="send-confirmation" class="confirmation" aria-labelledby="confirmation-title" aria-describedby="confirmation-description">
+    <div class="confirmation-icon" aria-hidden="true">↗</div>
+    <h2 id="confirmation-title">¿Enviar esta solicitud?</h2>
+    <p id="confirmation-description">Revisa el resumen. El correo se enviará al destinatario habitual y a las dos personas en copia.</p>
+    <dl class="confirmation-summary">
+      <div><dt>Plantilla</dt><dd id="confirmation-template"></dd></div>
+      <div><dt>Días</dt><dd id="confirmation-days"></dd></div>
+      <div><dt>Total</dt><dd id="confirmation-total"></dd></div>
+    </dl>
+    <div class="confirmation-actions">
+      <button id="cancel-send" class="secondary-button" type="button" autofocus>Cancelar</button>
+      <button id="confirm-send" class="send-button" type="button">Sí, enviar correo</button>
+    </div>
+  </dialog>
+  <div id="notification" class="notification" role="status" aria-live="polite" aria-atomic="true" hidden>
+    <span id="notification-icon" class="notification-icon" aria-hidden="true">✓</span>
+    <div><strong id="notification-title"></strong><p id="notification-message"></p></div>
+    <button id="close-notification" type="button" aria-label="Cerrar notificación">×</button>
+  </div>
 </body>
 </html>

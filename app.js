@@ -27,7 +27,11 @@
   const sendButton = document.getElementById('send-button');
   const sendLabel = document.getElementById('send-label');
   const status = document.getElementById('status');
+  const confirmation = document.getElementById('send-confirmation');
+  const confirmButton = document.getElementById('confirm-send');
+  const notification = document.getElementById('notification');
   let sending = false;
+  let pendingSend = null;
 
   function getDays() {
     const days = daysInput.valueAsNumber;
@@ -45,7 +49,21 @@
     status.textContent = message;
     status.className = `status ${type}`;
     status.hidden = false;
+    notification.className = `notification ${type}`;
+    document.getElementById('notification-icon').textContent = type === 'success' ? '✓' : '!';
+    document.getElementById('notification-title').textContent = type === 'success' ? '¡Correo enviado!' : 'No se pudo enviar';
+    document.getElementById('notification-message').textContent = message;
+    notification.hidden = false;
   }
+
+  document.getElementById('close-notification').addEventListener('click', () => {
+    notification.hidden = true;
+  });
+  document.getElementById('cancel-send').addEventListener('click', () => confirmation.close());
+  confirmation.addEventListener('close', () => {
+    if (!confirmation.open) pendingSend = null;
+  });
+  confirmation.addEventListener('cancel', () => { pendingSend = null; });
 
   function renderEmailPreview(totals) {
     preview.hidden = totals === null;
@@ -140,9 +158,9 @@
     onEdit();
   });
 
-  form.addEventListener('submit', async (event) => {
+  form.addEventListener('submit', (event) => {
     event.preventDefault();
-    if (sending) return;
+    if (sending || confirmation.open) return;
     updatePreview();
     if (!form.reportValidity()) return;
     const days = getDays();
@@ -184,8 +202,21 @@
       total_general: money(totals.total),
     };
 
+    pendingSend = { templateParams, config: { ...config }, recipient, totals, days };
+    document.getElementById('confirmation-template').textContent = templateSelect.selectedOptions[0].textContent;
+    document.getElementById('confirmation-days').textContent = `${days} ${days === 1 ? 'día' : 'días'}`;
+    document.getElementById('confirmation-total').textContent = money(totals.total);
+    confirmation.showModal();
+  });
+
+  confirmButton.addEventListener('click', async () => {
+    if (sending || !pendingSend || !confirmation.open) return;
+    const { templateParams, config, recipient, totals, days } = pendingSend;
+    pendingSend = null;
     status.hidden = true;
+    notification.hidden = true;
     setSending(true);
+    confirmation.close();
     try {
       await window.emailjs.send(
         config.SERVICE_ID.trim(),
@@ -210,5 +241,6 @@
   });
 
   document.getElementById('email-subject').textContent = SUBJECT;
+  daysInput.value = '1';
   updatePreview();
 })();
