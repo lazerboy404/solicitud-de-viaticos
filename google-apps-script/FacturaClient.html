@@ -1,13 +1,11 @@
 <script>
 (() => {
   'use strict';
-  const TEST_MODE = true;
   const PRODUCTION_RECIPIENT = 'facturacion@centralponiente.com.mx';
   const TAX_CERTIFICATE_NAME = 'SAT Constancia.pdf';
   const MAX_BYTES = 8 * 1024 * 1024;
   const form = document.getElementById('invoice-form');
   const dateInput = document.getElementById('invoice-date');
-  const recipientInput = document.getElementById('invoice-recipient');
   const ticketInput = document.getElementById('invoice-ticket');
   const subject = document.getElementById('invoice-subject');
   const body = document.getElementById('invoice-body');
@@ -17,6 +15,14 @@
   const notification = document.getElementById('invoice-notification');
   const thumbnail = document.getElementById('ticket-thumbnail');
   const longDate = new Intl.DateTimeFormat('es-MX', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  const mexicoHour = () => Number(new Intl.DateTimeFormat('en-US', { hour: '2-digit', hourCycle: 'h23', timeZone: 'America/Mexico_City' }).format(new Date()));
+  const greeting = () => {
+    const hour = mexicoHour();
+    if (hour >= 5 && hour < 12) return 'Buenos días';
+    if (hour >= 12 && hour < 19) return 'Buenas tardes';
+    return 'Buenas noches';
+  };
+  const datedTicketName = (file) => `ticket_${shortDate(dateInput.value).replace(/\//g, '-')}${file.name.match(/\.(jpe?g|png|webp)$/i)?.[0].toLowerCase() || ''}`;
   let pending = null;
   let busy = false;
   let thumbnailUrl = null;
@@ -31,10 +37,10 @@
   function render() {
     const date = parseDate(dateInput.value);
     subject.textContent = date ? `SOLICITUD DE FACTURA ${shortDate(dateInput.value)}` : 'SOLICITUD DE FACTURA · Selecciona una fecha';
-    document.getElementById('invoice-preview-recipient').textContent = recipientInput.value.trim() || 'Escribe tu correo de prueba';
-    body.innerHTML = date ? `<p>Buenos dias,</p><p>Por este medio le solicito de la manera más amable mi factura del estacionamiento ocupado el día ${longDate.format(date)}.</p><p>Adjunto a este correo encontrará mi ticket y mi constancia de situación fiscal con los datos necesarios para la facturación.</p><p>Agradezco de antemano su atención y apoyo con esta solicitud.</p><p>Atentamente,<br>Einar Ulises Arenas Hernandez</p>` : '<p>Selecciona una fecha válida para generar el mensaje.</p>';
+    document.getElementById('invoice-preview-recipient').textContent = PRODUCTION_RECIPIENT;
+    body.innerHTML = date ? `<p>${greeting()},</p><p>Por este medio le solicito de la manera más amable mi factura del estacionamiento ocupado el día ${longDate.format(date)}.</p><p>Adjunto a este correo encontrará mi ticket y mi constancia de situación fiscal con los datos necesarios para la facturación.</p><p>Agradezco de antemano su atención y apoyo con esta solicitud.</p><p>Atentamente,<br>Einar Ulises Arenas Hernandez</p>` : '<p>Selecciona una fecha válida para generar el mensaje.</p>';
     document.getElementById('invoice-preview-pdf').textContent = `PDF · ${TAX_CERTIFICATE_NAME} (fijo)`;
-    document.getElementById('invoice-preview-ticket').textContent = ticketInput.files[0] ? `Ticket · ${ticketInput.files[0].name}` : 'Ticket pendiente';
+    document.getElementById('invoice-preview-ticket').textContent = ticketInput.files[0] ? `Ticket · ${datedTicketName(ticketInput.files[0])}` : 'Ticket pendiente';
   }
   function notify(message, type) {
     status.textContent = message;
@@ -48,7 +54,7 @@
   }
   function setBusy(value) {
     busy = value;
-    for (const control of [dateInput, recipientInput, ticketInput, sendButton]) control.disabled = value;
+    for (const control of [dateInput, ticketInput, sendButton]) control.disabled = value;
     form.setAttribute('aria-busy', String(value));
     sendButton.classList.toggle('is-loading', value);
     document.getElementById('invoice-send-label').textContent = value ? 'Enviando...' : 'Revisar y enviar solicitud';
@@ -80,7 +86,6 @@
       .sendInvoiceRequest(payload);
   }
   dateInput.addEventListener('input', render);
-  recipientInput.addEventListener('input', () => { status.hidden = true; render(); });
   ticketInput.addEventListener('change', () => { status.hidden = true; render(); });
   ticketInput.addEventListener('change', () => {
     if (thumbnailUrl) URL.revokeObjectURL(thumbnailUrl);
@@ -101,7 +106,6 @@
   form.addEventListener('submit', event => {
     event.preventDefault();
     if (busy || dialog.open) return;
-    recipientInput.value = TEST_MODE ? recipientInput.value.trim() : PRODUCTION_RECIPIENT;
     render();
     if (!form.reportValidity()) return;
     if (!parseDate(dateInput.value)) return notify('Selecciona una fecha válida entre 2000 y 2100.', 'error');
@@ -109,10 +113,10 @@
     if (!ticket) return notify('Selecciona la foto del ticket.', 'error');
     if (!/\.(jpe?g|png|webp)$/i.test(ticket.name)) return notify('La foto del ticket debe ser JPG, PNG o WEBP.', 'error');
     if (!ticket.size || ticket.size > MAX_BYTES) return notify('Selecciona una foto no vacía de máximo 8 MB. La constancia fija se suma en el servidor.', 'error');
-    pending = { recipient: recipientInput.value, date: dateInput.value, mode: TEST_MODE ? 'test' : 'production', ticket };
+    pending = { recipient: PRODUCTION_RECIPIENT, date: dateInput.value, mode: 'production', ticket };
     document.getElementById('invoice-confirm-to').textContent = pending.recipient;
     document.getElementById('invoice-confirm-subject').textContent = subject.textContent;
-    document.getElementById('invoice-confirm-files').textContent = `${TAX_CERTIFICATE_NAME} + ${ticket.name}`;
+    document.getElementById('invoice-confirm-files').textContent = `${TAX_CERTIFICATE_NAME} + ${datedTicketName(ticket)}`;
     dialog.showModal();
   });
   document.getElementById('invoice-confirm').addEventListener('click', async () => {
@@ -131,13 +135,6 @@
       notify(error.message || 'No se pudieron preparar los archivos.', 'error');
     }
   });
-  if (!TEST_MODE) {
-    document.getElementById('invoice-mode').textContent = 'Solicitud de factura · Envío al estacionamiento';
-    document.getElementById('invoice-recipient-label').textContent = 'Destinatario';
-    document.getElementById('invoice-recipient-help').textContent = 'Correo de facturación del estacionamiento.';
-    recipientInput.value = PRODUCTION_RECIPIENT;
-    recipientInput.readOnly = true;
-  }
   const today = new Date();
   dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   render();

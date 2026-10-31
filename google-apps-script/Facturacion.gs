@@ -1,7 +1,7 @@
 // Servicio privado: la interfaz HTML también se sirve desde este proyecto para
 // utilizar google.script.run y respetar el acceso limitado a la organización.
 const INVOICE_SETTINGS = Object.freeze({
-  TEST_MODE: true,
+  TEST_MODE: false,
   // Vacío = permite pruebas solo a la cuenta Google que ejecuta el servicio.
   TEST_EMAIL: '',
   // ID privado del PDF en Drive. No pegues el ID en el sitio público de GitHub.
@@ -43,6 +43,13 @@ function invoiceDate_(value) {
   return { short: value.split('-').reverse().join('/'), long: String(day).padStart(2, '0') + ' de ' + months[month - 1] + ' de ' + year };
 }
 
+function invoiceGreeting_() {
+  const hour = Number(Utilities.formatDate(new Date(), 'America/Mexico_City', 'H'));
+  if (hour >= 5 && hour < 12) return 'Buenos días';
+  if (hour >= 12 && hour < 19) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
 function taxCertificate_() {
   if (!INVOICE_SETTINGS.TAX_CERTIFICATE_FILE_ID) throw new Error('Falta guardar tu constancia PDF en Google Drive y configurar su ID en Apps Script.');
   const file = DriveApp.getFileById(INVOICE_SETTINGS.TAX_CERTIFICATE_FILE_ID);
@@ -54,7 +61,7 @@ function taxCertificate_() {
   return Utilities.newBlob(bytes, 'application/pdf', INVOICE_SETTINGS.TAX_CERTIFICATE_NAME);
 }
 
-function ticketAttachment_(files) {
+function ticketAttachment_(files, date) {
   if (!Array.isArray(files) || files.length !== 1) throw new Error('Selecciona la foto del ticket.');
   const file = files[0];
   if (!file || typeof file.name !== 'string' || typeof file.data !== 'string' || !file.data || file.data.length > 12 * 1024 * 1024 || !/^[A-Za-z0-9+/]+={0,2}$/.test(file.data)) throw new Error('La foto del ticket no se pudo leer. Selecciónala de nuevo.');
@@ -67,11 +74,13 @@ function ticketAttachment_(files) {
   else if (/\.png$/i.test(name) && b[0] === 137 && b[1] === 80 && b[2] === 78 && b[3] === 71 && b[4] === 13 && b[5] === 10 && b[6] === 26 && b[7] === 10) mime = 'image/png';
   else if (/\.webp$/i.test(name) && b[0] === 82 && b[1] === 73 && b[2] === 70 && b[3] === 70 && b[8] === 87 && b[9] === 69 && b[10] === 66 && b[11] === 80) mime = 'image/webp';
   else throw new Error('La foto del ticket debe ser un archivo JPG, PNG o WEBP válido.');
-  return Utilities.newBlob(bytes, mime, name);
+  const extension = name.match(/\.(jpe?g|png|webp)$/i)[0].toLowerCase();
+  const datedName = 'ticket_' + date.short.replace(/\//g, '-') + extension;
+  return Utilities.newBlob(bytes, mime, datedName);
 }
 
 function invoiceBody_(date) {
-  return 'Buenos dias,\n\n' +
+  return invoiceGreeting_() + ',\n\n' +
     'Por este medio le solicito de la manera más amable mi factura del estacionamiento ocupado el día ' + date.long + '.\n\n' +
     'Adjunto a este correo encontrará mi ticket y mi constancia de situación fiscal con los datos necesarios para la facturación.\n\n' +
     'Agradezco de antemano su atención y apoyo con esta solicitud.\n\n' +
@@ -91,7 +100,7 @@ function sendInvoiceRequest(payload) {
     }
     const date = invoiceDate_(payload.date);
     const certificate = taxCertificate_();
-    const ticket = ticketAttachment_(payload.attachments);
+    const ticket = ticketAttachment_(payload.attachments, date);
     if (certificate.getBytes().length + ticket.getBytes().length > 8 * 1024 * 1024) throw new Error('La constancia y la foto del ticket deben sumar como máximo 8 MB.');
     lock = LockService.getScriptLock();
     if (!lock.tryLock(15000)) throw new Error('Hay otro envío en proceso. Espera unos momentos y revisa Enviados antes de reintentar.');

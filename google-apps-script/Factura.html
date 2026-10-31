@@ -13,7 +13,7 @@
   <main class="page">
     <nav class="section-nav" aria-label="Tipo de solicitud"><a href="https://lazerboy404.github.io/solicitud-de-viaticos/">Viáticos</a><a href="#factura" aria-current="page">Factura de estacionamiento</a></nav>
     <div class="intro"><h1>Factura de estacionamiento</h1><p>Selecciona la fecha y adjunta tus documentos.</p></div>
-    <p id="invoice-mode" class="test-banner">Modo de prueba · Escribe tu correo de trabajo para enviarte la prueba.</p>
+    <p id="invoice-mode" class="test-banner">Solicitud de factura para el estacionamiento.</p>
     <form id="invoice-form">
       <div class="workspace">
         <section id="factura" class="card settings" aria-labelledby="invoice-details">
@@ -21,10 +21,6 @@
           <label for="invoice-date">Fecha del estacionamiento</label>
           <input id="invoice-date" type="date" min="2000-01-01" max="2100-12-31" required aria-describedby="invoice-date-help">
           <p id="invoice-date-help" class="field-help">La fecha se coloca en el asunto y en el cuerpo del correo.</p>
-          <label id="invoice-recipient-label" for="invoice-recipient">Tu correo para la prueba</label>
-          <input id="invoice-recipient" type="email" placeholder="correo@intt2.com" autocomplete="email" maxlength="254" required aria-describedby="invoice-recipient-help">
-          <p id="invoice-recipient-help" class="field-help">Usa la cuenta de trabajo con la que abriste esta página.</p>
-          <div class="fixed-document"><span class="fixed-document-icon" aria-hidden="true">PDF</span><div><strong>SAT Constancia.pdf</strong><small>Constancia fija · se adjunta automáticamente</small></div></div>
           <label for="invoice-ticket">Foto del ticket</label>
           <input id="invoice-ticket" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required aria-describedby="invoice-ticket-info">
           <p id="invoice-ticket-info" class="field-help">JPG, PNG o WEBP. Máximo 8 MB entre el ticket y la constancia fija.</p>
@@ -34,7 +30,7 @@
         <section class="card preview" aria-labelledby="invoice-preview-heading">
           <div class="section-heading"><span class="step">02</span><h2 id="invoice-preview-heading">Revisa tu correo</h2><span class="preview-badge">Vista previa</span></div>
           <div class="preview-subject"><span>Asunto</span><h3 id="invoice-subject">SOLICITUD DE FACTURA</h3></div>
-          <div class="email-header"><div><span>Para</span><strong id="invoice-preview-recipient">Escribe tu correo de prueba</strong></div></div>
+          <div class="email-header"><div><span>Para</span><strong id="invoice-preview-recipient">facturacion@centralponiente.com.mx</strong></div></div>
           <div id="invoice-body" class="invoice-body"></div>
           <div class="invoice-attachments" aria-label="Archivos adjuntos"><span id="invoice-preview-pdf">PDF · SAT Constancia.pdf</span><span id="invoice-preview-ticket">Ticket pendiente</span></div>
           <div class="preview-footer">La fecha y los archivos se actualizan al seleccionarlos.</div>
