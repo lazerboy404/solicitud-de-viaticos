@@ -2,6 +2,10 @@
 
 Aplicación estática en HTML, CSS y JavaScript. Calcula los viáticos, genera una vista previa y envía el correo en segundo plano con el SDK de **EmailJS**. Funciona en Vercel y GitHub Pages, sin servidor propio ni compilación.
 
+## Apartado independiente de facturación
+
+La pestaña **Factura de estacionamiento** abre una interfaz privada de Google Apps Script con calendario y adjuntos PDF + foto del ticket. La cuenta de Workspace limita el acceso a la organización; por eso la interfaz de facturas y el envío viven dentro de Apps Script. El enlace desde GitHub redirige a esa página. Está preparada en modo de prueba, para enviar únicamente a la cuenta propietaria de la implementación. Sigue [FACTURACION.md](./FACTURACION.md). Este apartado no cambia la configuración ni el envío de viáticos.
+
 ## Archivos
 
 | Archivo | Función |
@@ -11,6 +15,9 @@ Aplicación estática en HTML, CSS y JavaScript. Calcula los viáticos, genera u
 | `config.js` | Los tres valores de tu cuenta EmailJS y los destinatarios fijos en `MAIL_RECIPIENTS`. |
 | `app.js` | Cálculos, validaciones, plantilla y envío. |
 | `emailjs-template.html` | Contenido para pegar en la plantilla del panel de EmailJS. |
+| `factura.html` | Redirige al apartado privado de facturas servido por Apps Script. |
+| `google-apps-script/` | Backend de adjuntos y archivos HTML del apartado privado de Apps Script. |
+| `FACTURACION.md` | Pasos para actualizar Apps Script y probar los adjuntos. |
 
 ## 1. Conectar tu servicio de correo
 
@@ -101,7 +108,7 @@ python -m http.server 5500
 
 Abre `http://localhost:5500`. Necesitas Internet para cargar EmailJS y enviar; las fuentes usan Google Fonts y tienen fuentes de sistema como alternativa.
 
-1. Revisa los destinatarios fijos mostrados en la página. Para una prueba personal, cambia temporalmente `MAIL_RECIPIENTS` en `config.js` por tus cuentas de prueba, incluidas las copias, y recarga. Restaura los destinatarios habituales al terminar.
+1. Los destinatarios de viáticos están configurados en `MAIL_RECIPIENTS` dentro de `config.js`. El formulario no los muestra. Para probar con otras cuentas, cambia ahí los valores temporalmente y recarga; restáuralos al terminar.
 2. Selecciona **1 día**. Debe mostrar alimentos **$350.00 MXN**, traslado **$800.00 MXN**, autobús **$180.00 MXN** y total **$1,330.00 MXN**.
 3. Selecciona **5 días**. Debe mostrar **$1,750.00 MXN**, **$4,000.00 MXN**, **$900.00 MXN** y total **$6,650.00 MXN**.
 4. Revisa la vista previa y presiona **Generar y Enviar Correo Directamente**.

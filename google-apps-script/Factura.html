@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <?!= include('FacturaStyles'); ?>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="https://lazerboy404.github.io/solicitud-de-viaticos/" aria-label="Volver a viáticos"><span class="brand-icon" aria-hidden="true">✉</span> solicitudes<span class="brand-dot">/</span></a>
+    <span class="topbar-caption">INTELLIGENCE &amp; TELECOM TECHNOLOGIES</span>
+  </header>
+  <main class="page">
+    <nav class="section-nav" aria-label="Tipo de solicitud"><a href="https://lazerboy404.github.io/solicitud-de-viaticos/">Viáticos</a><a href="#factura" aria-current="page">Factura de estacionamiento</a></nav>
+    <div class="intro"><h1>Factura de estacionamiento</h1><p>Selecciona la fecha y adjunta tus documentos.</p></div>
+    <p id="invoice-mode" class="test-banner">Modo de prueba · Escribe tu correo de trabajo para enviarte la prueba.</p>
+    <form id="invoice-form">
+      <div class="workspace">
+        <section id="factura" class="card settings" aria-labelledby="invoice-details">
+          <div class="section-heading"><span class="step">01</span><h2 id="invoice-details">Datos y documentos</h2></div>
+          <label for="invoice-date">Fecha del estacionamiento</label>
+          <input id="invoice-date" type="date" min="2000-01-01" max="2100-12-31" required aria-describedby="invoice-date-help">
+          <p id="invoice-date-help" class="field-help">La fecha se coloca en el asunto y en el cuerpo del correo.</p>
+          <label id="invoice-recipient-label" for="invoice-recipient">Tu correo para la prueba</label>
+          <input id="invoice-recipient" type="email" placeholder="correo@intt2.com" autocomplete="email" maxlength="254" required aria-describedby="invoice-recipient-help">
+          <p id="invoice-recipient-help" class="field-help">Usa la cuenta de trabajo con la que abriste esta página.</p>
+          <label for="invoice-pdf">Constancia de situación fiscal · PDF</label>
+          <input id="invoice-pdf" type="file" accept=".pdf,application/pdf" required aria-describedby="invoice-pdf-info">
+          <p id="invoice-pdf-info" class="field-help">Selecciona tu constancia en PDF.</p>
+          <label for="invoice-ticket">Foto del ticket</label>
+          <input id="invoice-ticket" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required aria-describedby="invoice-ticket-info">
+          <p id="invoice-ticket-info" class="field-help">JPG, PNG o WEBP. Máximo 8 MB entre ambos archivos.</p>
+          <img id="ticket-thumbnail" class="ticket-thumbnail" alt="Vista previa de la foto del ticket seleccionada" hidden>
+          <p class="attachment-note">Ambos documentos se enviarán como archivos adjuntos al correo.</p>
+        </section>
+        <section class="card preview" aria-labelledby="invoice-preview-heading">
+          <div class="section-heading"><span class="step">02</span><h2 id="invoice-preview-heading">Revisa tu correo</h2><span class="preview-badge">Vista previa</span></div>
+          <div class="preview-subject"><span>Asunto</span><h3 id="invoice-subject">SOLICITUD DE FACTURA</h3></div>
+          <div class="email-header"><div><span>Para</span><strong id="invoice-preview-recipient">Escribe tu correo de prueba</strong></div></div>
+          <div id="invoice-body" class="invoice-body"></div>
+          <div class="invoice-attachments" aria-label="Archivos adjuntos"><span id="invoice-preview-pdf">PDF pendiente</span><span id="invoice-preview-ticket">Ticket pendiente</span></div>
+          <div class="preview-footer">La fecha y los archivos se actualizan al seleccionarlos.</div>
+        </section>
+      </div>
+      <div class="send-panel"><p><strong>Solicitud con dos adjuntos.</strong><span>Se enviará desde tu cuenta de Google.</span></p><button id="invoice-send" class="send-button" type="submit"><span class="send-icon" aria-hidden="true">↗</span><span id="invoice-send-label">Revisar y enviar solicitud</span><span class="spinner" aria-hidden="true"></span></button></div>
+      <div id="invoice-status" class="status" hidden></div>
+    </form>
+    <footer class="page-footer"><span>EINAR ULISES ARENAS HERNÁNDEZ</span><span>Solicitud de facturación</span></footer>
+  </main>
+  <dialog id="invoice-confirmation" class="confirmation" aria-labelledby="invoice-confirmation-title" aria-describedby="invoice-confirmation-description">
+    <div class="confirmation-icon" aria-hidden="true">↗</div><h2 id="invoice-confirmation-title">¿Enviar la solicitud de factura?</h2><p id="invoice-confirmation-description">El PDF y la foto se adjuntarán al correo.</p>
+    <dl class="confirmation-summary"><div><dt>Destinatario</dt><dd id="invoice-confirm-to"></dd></div><div><dt>Asunto</dt><dd id="invoice-confirm-subject"></dd></div><div><dt>Adjuntos</dt><dd id="invoice-confirm-files"></dd></div></dl>
+    <div class="confirmation-actions"><button id="invoice-cancel" class="secondary-button" type="button" autofocus>Cancelar</button><button id="invoice-confirm" class="send-button" type="button">Sí, enviar correo</button></div>
+  </dialog>
+  <div id="invoice-notification" class="notification" role="status" aria-live="polite" aria-atomic="true" hidden><span id="invoice-notification-icon" class="notification-icon" aria-hidden="true">✓</span><div><strong id="invoice-notification-title"></strong><p id="invoice-notification-message"></p></div><button id="invoice-notification-close" type="button" aria-label="Cerrar notificación">×</button></div>
+  <?!= include('FacturaClient'); ?>
+</body>
+</html>

@@ -1,0 +1,4 @@
+.section-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+.section-nav a { padding: 9px 14px; border: 1px solid transparent; border-radius: 8px; color: var(--muted); font-size: 12px; font-weight: 600; text-decoration: none; }
+.section-nav a:hover { background: #eaf0e4; color: var(--ink); }
+.section-nav a[aria-current="page"] { border-color: var(--border); background: white; color: var(--ink); }
