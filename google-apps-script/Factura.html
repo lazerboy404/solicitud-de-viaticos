@@ -24,12 +24,10 @@
           <label id="invoice-recipient-label" for="invoice-recipient">Tu correo para la prueba</label>
           <input id="invoice-recipient" type="email" placeholder="correo@intt2.com" autocomplete="email" maxlength="254" required aria-describedby="invoice-recipient-help">
           <p id="invoice-recipient-help" class="field-help">Usa la cuenta de trabajo con la que abriste esta página.</p>
-          <label for="invoice-pdf">Constancia de situación fiscal · PDF</label>
-          <input id="invoice-pdf" type="file" accept=".pdf,application/pdf" required aria-describedby="invoice-pdf-info">
-          <p id="invoice-pdf-info" class="field-help">Selecciona tu constancia en PDF.</p>
+          <div class="fixed-document"><span class="fixed-document-icon" aria-hidden="true">PDF</span><div><strong>SAT Constancia.pdf</strong><small>Constancia fija · se adjunta automáticamente</small></div></div>
           <label for="invoice-ticket">Foto del ticket</label>
           <input id="invoice-ticket" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required aria-describedby="invoice-ticket-info">
-          <p id="invoice-ticket-info" class="field-help">JPG, PNG o WEBP. Máximo 8 MB entre ambos archivos.</p>
+          <p id="invoice-ticket-info" class="field-help">JPG, PNG o WEBP. Máximo 8 MB entre el ticket y la constancia fija.</p>
           <img id="ticket-thumbnail" class="ticket-thumbnail" alt="Vista previa de la foto del ticket seleccionada" hidden>
           <p class="attachment-note">Ambos documentos se enviarán como archivos adjuntos al correo.</p>
         </section>
@@ -38,11 +36,11 @@
           <div class="preview-subject"><span>Asunto</span><h3 id="invoice-subject">SOLICITUD DE FACTURA</h3></div>
           <div class="email-header"><div><span>Para</span><strong id="invoice-preview-recipient">Escribe tu correo de prueba</strong></div></div>
           <div id="invoice-body" class="invoice-body"></div>
-          <div class="invoice-attachments" aria-label="Archivos adjuntos"><span id="invoice-preview-pdf">PDF pendiente</span><span id="invoice-preview-ticket">Ticket pendiente</span></div>
+          <div class="invoice-attachments" aria-label="Archivos adjuntos"><span id="invoice-preview-pdf">PDF · SAT Constancia.pdf</span><span id="invoice-preview-ticket">Ticket pendiente</span></div>
           <div class="preview-footer">La fecha y los archivos se actualizan al seleccionarlos.</div>
         </section>
       </div>
-      <div class="send-panel"><p><strong>Solicitud con dos adjuntos.</strong><span>Se enviará desde tu cuenta de Google.</span></p><button id="invoice-send" class="send-button" type="submit"><span class="send-icon" aria-hidden="true">↗</span><span id="invoice-send-label">Revisar y enviar solicitud</span><span class="spinner" aria-hidden="true"></span></button></div>
+      <div class="send-panel"><p><strong>Solicitud con dos adjuntos.</strong><span>La constancia se agrega automáticamente; solo selecciona la foto del ticket.</span></p><button id="invoice-send" class="send-button" type="submit"><span class="send-icon" aria-hidden="true">↗</span><span id="invoice-send-label">Revisar y enviar solicitud</span><span class="spinner" aria-hidden="true"></span></button></div>
       <div id="invoice-status" class="status" hidden></div>
     </form>
     <footer class="page-footer"><span>EINAR ULISES ARENAS HERNÁNDEZ</span><span>Solicitud de facturación</span></footer>

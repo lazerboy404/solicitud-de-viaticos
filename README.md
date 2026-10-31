@@ -4,7 +4,7 @@ Aplicación estática en HTML, CSS y JavaScript. Calcula los viáticos, genera u
 
 ## Apartado independiente de facturación
 
-La pestaña **Factura de estacionamiento** abre una interfaz privada de Google Apps Script con calendario y adjuntos PDF + foto del ticket. La cuenta de Workspace limita el acceso a la organización; por eso la interfaz de facturas y el envío viven dentro de Apps Script. El enlace desde GitHub redirige a esa página. Está preparada en modo de prueba, para enviar únicamente a la cuenta propietaria de la implementación. Sigue [FACTURACION.md](./FACTURACION.md). Este apartado no cambia la configuración ni el envío de viáticos.
+La pestaña **Factura de estacionamiento** abre una interfaz privada de Google Apps Script con calendario y adjuntos: la constancia PDF fija se carga una vez a Drive privado y solo se selecciona la foto del ticket por solicitud. La cuenta de Workspace limita el acceso a la organización; por eso la interfaz de facturas y el envío viven dentro de Apps Script. El enlace desde GitHub redirige a esa página. Está preparada en modo de prueba, para enviar únicamente a la cuenta propietaria de la implementación. Sigue [FACTURACION.md](./FACTURACION.md). Este apartado no cambia la configuración ni el envío de viáticos.
 
 ## Archivos
 

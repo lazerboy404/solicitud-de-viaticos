@@ -3,11 +3,11 @@
   'use strict';
   const TEST_MODE = true;
   const PRODUCTION_RECIPIENT = 'facturacion@centralponiente.com.mx';
+  const TAX_CERTIFICATE_NAME = 'SAT Constancia.pdf';
   const MAX_BYTES = 8 * 1024 * 1024;
   const form = document.getElementById('invoice-form');
   const dateInput = document.getElementById('invoice-date');
   const recipientInput = document.getElementById('invoice-recipient');
-  const pdfInput = document.getElementById('invoice-pdf');
   const ticketInput = document.getElementById('invoice-ticket');
   const subject = document.getElementById('invoice-subject');
   const body = document.getElementById('invoice-body');
@@ -33,7 +33,7 @@
     subject.textContent = date ? `SOLICITUD DE FACTURA ${shortDate(dateInput.value)}` : 'SOLICITUD DE FACTURA · Selecciona una fecha';
     document.getElementById('invoice-preview-recipient').textContent = recipientInput.value.trim() || 'Escribe tu correo de prueba';
     body.innerHTML = date ? `<p>Buenos dias,</p><p>Por este medio le solicito de la manera más amable mi factura del estacionamiento ocupado el día ${longDate.format(date)}.</p><p>Adjunto a este correo encontrará mi ticket y mi constancia de situación fiscal con los datos necesarios para la facturación.</p><p>Agradezco de antemano su atención y apoyo con esta solicitud.</p><p>Atentamente,<br>Einar Ulises Arenas Hernandez</p>` : '<p>Selecciona una fecha válida para generar el mensaje.</p>';
-    document.getElementById('invoice-preview-pdf').textContent = pdfInput.files[0] ? `PDF · ${pdfInput.files[0].name}` : 'PDF pendiente';
+    document.getElementById('invoice-preview-pdf').textContent = `PDF · ${TAX_CERTIFICATE_NAME} (fijo)`;
     document.getElementById('invoice-preview-ticket').textContent = ticketInput.files[0] ? `Ticket · ${ticketInput.files[0].name}` : 'Ticket pendiente';
   }
   function notify(message, type) {
@@ -48,7 +48,7 @@
   }
   function setBusy(value) {
     busy = value;
-    for (const control of [dateInput, recipientInput, pdfInput, ticketInput, sendButton]) control.disabled = value;
+    for (const control of [dateInput, recipientInput, ticketInput, sendButton]) control.disabled = value;
     form.setAttribute('aria-busy', String(value));
     sendButton.classList.toggle('is-loading', value);
     document.getElementById('invoice-send-label').textContent = value ? 'Enviando...' : 'Revisar y enviar solicitud';
@@ -81,7 +81,7 @@
   }
   dateInput.addEventListener('input', render);
   recipientInput.addEventListener('input', () => { status.hidden = true; render(); });
-  for (const input of [pdfInput, ticketInput]) input.addEventListener('change', () => { status.hidden = true; render(); });
+  ticketInput.addEventListener('change', () => { status.hidden = true; render(); });
   ticketInput.addEventListener('change', () => {
     if (thumbnailUrl) URL.revokeObjectURL(thumbnailUrl);
     thumbnailUrl = null;
@@ -105,14 +105,14 @@
     render();
     if (!form.reportValidity()) return;
     if (!parseDate(dateInput.value)) return notify('Selecciona una fecha válida entre 2000 y 2100.', 'error');
-    const pdf = pdfInput.files[0], ticket = ticketInput.files[0];
-    if (!pdf || !ticket) return notify('Selecciona la constancia PDF y la foto del ticket.', 'error');
-    if (!/\.pdf$/i.test(pdf.name) || !/\.(jpe?g|png|webp)$/i.test(ticket.name)) return notify('La constancia debe ser PDF y el ticket JPG, PNG o WEBP.', 'error');
-    if (!pdf.size || !ticket.size || pdf.size + ticket.size > MAX_BYTES) return notify('Selecciona archivos no vacíos que sumen como máximo 8 MB.', 'error');
-    pending = { recipient: recipientInput.value, date: dateInput.value, mode: TEST_MODE ? 'test' : 'production', pdf, ticket };
+    const ticket = ticketInput.files[0];
+    if (!ticket) return notify('Selecciona la foto del ticket.', 'error');
+    if (!/\.(jpe?g|png|webp)$/i.test(ticket.name)) return notify('La foto del ticket debe ser JPG, PNG o WEBP.', 'error');
+    if (!ticket.size || ticket.size > MAX_BYTES) return notify('Selecciona una foto no vacía de máximo 8 MB. La constancia fija se suma en el servidor.', 'error');
+    pending = { recipient: recipientInput.value, date: dateInput.value, mode: TEST_MODE ? 'test' : 'production', ticket };
     document.getElementById('invoice-confirm-to').textContent = pending.recipient;
     document.getElementById('invoice-confirm-subject').textContent = subject.textContent;
-    document.getElementById('invoice-confirm-files').textContent = `${pdf.name} + ${ticket.name}`;
+    document.getElementById('invoice-confirm-files').textContent = `${TAX_CERTIFICATE_NAME} + ${ticket.name}`;
     dialog.showModal();
   });
   document.getElementById('invoice-confirm').addEventListener('click', async () => {
@@ -124,7 +124,7 @@
     notification.hidden = true;
     dialog.close();
     try {
-      const attachments = await Promise.all([readFile(snapshot.pdf), readFile(snapshot.ticket)]);
+      const attachments = await Promise.all([readFile(snapshot.ticket)]);
       send({ requestId: requestId(), recipient: snapshot.recipient, date: snapshot.date, mode: snapshot.mode, attachments });
     } catch (error) {
       setBusy(false);

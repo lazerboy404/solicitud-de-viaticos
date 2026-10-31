@@ -4,6 +4,9 @@ const INVOICE_SETTINGS = Object.freeze({
   TEST_MODE: true,
   // Vacío = permite pruebas solo a la cuenta Google que ejecuta el servicio.
   TEST_EMAIL: '',
+  // ID privado del PDF en Drive. No pegues el ID en el sitio público de GitHub.
+  TAX_CERTIFICATE_FILE_ID: '',
+  TAX_CERTIFICATE_NAME: 'SAT Constancia.pdf',
   PRODUCTION_EMAIL: 'facturacion@centralponiente.com.mx',
 });
 
@@ -19,6 +22,8 @@ function include(filename) {
 
 function autorizarFacturacion() {
   GmailApp.getAliases();
+  DriveApp.getRootFolder().getName();
+  if (INVOICE_SETTINGS.TAX_CERTIFICATE_FILE_ID) DriveApp.getFileById(INVOICE_SETTINGS.TAX_CERTIFICATE_FILE_ID).getName();
   Logger.log('Correo de prueba: ' + testRecipient_());
 }
 
@@ -38,31 +43,31 @@ function invoiceDate_(value) {
   return { short: value.split('-').reverse().join('/'), long: String(day).padStart(2, '0') + ' de ' + months[month - 1] + ' de ' + year };
 }
 
-function invoiceAttachments_(files) {
-  if (!Array.isArray(files) || files.length !== 2) throw new Error('Se necesitan el PDF fiscal y una foto del ticket.');
-  let total = 0;
-  return files.map(function (file, index) {
-    if (!file || typeof file.name !== 'string' || typeof file.data !== 'string' || !file.data || file.data.length > 12 * 1024 * 1024 || !/^[A-Za-z0-9+/]+={0,2}$/.test(file.data)) throw new Error('Uno de los archivos no se pudo leer. Selecciónalo de nuevo.');
-    const name = file.name.replace(/[\\/\r\n\x00-\x1f]/g, '_').slice(-120);
-    const bytes = Utilities.base64Decode(file.data);
-    total += bytes.length;
-    if (!bytes.length || total > 8 * 1024 * 1024) throw new Error('Los archivos deben sumar como máximo 8 MB y no estar vacíos.');
-    const b = bytes.slice(0, 12).map(function (value) { return value & 255; });
-    let mime;
-    if (index === 0) {
-      if (!/\.pdf$/i.test(name) || b[0] !== 37 || b[1] !== 80 || b[2] !== 68 || b[3] !== 70 || b[4] !== 45) throw new Error('La constancia no es un archivo PDF válido.');
-      mime = 'application/pdf';
-    } else if (/\.jpe?g$/i.test(name) && b[0] === 255 && b[1] === 216 && b[2] === 255) {
-      mime = 'image/jpeg';
-    } else if (/\.png$/i.test(name) && b[0] === 137 && b[1] === 80 && b[2] === 78 && b[3] === 71 && b[4] === 13 && b[5] === 10 && b[6] === 26 && b[7] === 10) {
-      mime = 'image/png';
-    } else if (/\.webp$/i.test(name) && b[0] === 82 && b[1] === 73 && b[2] === 70 && b[3] === 70 && b[8] === 87 && b[9] === 69 && b[10] === 66 && b[11] === 80) {
-      mime = 'image/webp';
-    } else {
-      throw new Error('La foto del ticket debe ser un archivo JPG, PNG o WEBP válido.');
-    }
-    return Utilities.newBlob(bytes, mime, name);
-  });
+function taxCertificate_() {
+  if (!INVOICE_SETTINGS.TAX_CERTIFICATE_FILE_ID) throw new Error('Falta guardar tu constancia PDF en Google Drive y configurar su ID en Apps Script.');
+  const file = DriveApp.getFileById(INVOICE_SETTINGS.TAX_CERTIFICATE_FILE_ID);
+  if (file.getMimeType() !== 'application/pdf') throw new Error('El archivo fijo de Drive no es un PDF. Revisa el ID de la constancia.');
+  const bytes = file.getBlob().getBytes();
+  const signature = bytes.slice(0, 5).map(function (value) { return value & 255; });
+  if (signature[0] !== 37 || signature[1] !== 80 || signature[2] !== 68 || signature[3] !== 70 || signature[4] !== 45) throw new Error('El archivo fijo de Drive no es una constancia PDF válida.');
+  if (!bytes.length || bytes.length > 8 * 1024 * 1024) throw new Error('La constancia PDF debe tener un tamaño máximo de 8 MB.');
+  return Utilities.newBlob(bytes, 'application/pdf', INVOICE_SETTINGS.TAX_CERTIFICATE_NAME);
+}
+
+function ticketAttachment_(files) {
+  if (!Array.isArray(files) || files.length !== 1) throw new Error('Selecciona la foto del ticket.');
+  const file = files[0];
+  if (!file || typeof file.name !== 'string' || typeof file.data !== 'string' || !file.data || file.data.length > 12 * 1024 * 1024 || !/^[A-Za-z0-9+/]+={0,2}$/.test(file.data)) throw new Error('La foto del ticket no se pudo leer. Selecciónala de nuevo.');
+  const name = file.name.replace(/[\\/\r\n\x00-\x1f]/g, '_').slice(-120);
+  const bytes = Utilities.base64Decode(file.data);
+  const b = bytes.slice(0, 12).map(function (value) { return value & 255; });
+  if (!bytes.length || /\.(jpe?g|png|webp)$/i.test(name) === false) throw new Error('La foto del ticket debe ser JPG, PNG o WEBP.');
+  let mime;
+  if (/\.jpe?g$/i.test(name) && b[0] === 255 && b[1] === 216 && b[2] === 255) mime = 'image/jpeg';
+  else if (/\.png$/i.test(name) && b[0] === 137 && b[1] === 80 && b[2] === 78 && b[3] === 71 && b[4] === 13 && b[5] === 10 && b[6] === 26 && b[7] === 10) mime = 'image/png';
+  else if (/\.webp$/i.test(name) && b[0] === 82 && b[1] === 73 && b[2] === 70 && b[3] === 70 && b[8] === 87 && b[9] === 69 && b[10] === 66 && b[11] === 80) mime = 'image/webp';
+  else throw new Error('La foto del ticket debe ser un archivo JPG, PNG o WEBP válido.');
+  return Utilities.newBlob(bytes, mime, name);
 }
 
 function invoiceBody_(date) {
@@ -85,13 +90,15 @@ function sendInvoiceRequest(payload) {
       throw new Error(INVOICE_SETTINGS.TEST_MODE ? 'Para las pruebas, escribe el correo de la cuenta de Google que estás usando para abrir esta página.' : 'El destinatario no coincide con el correo de facturación configurado.');
     }
     const date = invoiceDate_(payload.date);
-    const attachments = invoiceAttachments_(payload.attachments);
+    const certificate = taxCertificate_();
+    const ticket = ticketAttachment_(payload.attachments);
+    if (certificate.getBytes().length + ticket.getBytes().length > 8 * 1024 * 1024) throw new Error('La constancia y la foto del ticket deben sumar como máximo 8 MB.');
     lock = LockService.getScriptLock();
     if (!lock.tryLock(15000)) throw new Error('Hay otro envío en proceso. Espera unos momentos y revisa Enviados antes de reintentar.');
     const cache = CacheService.getScriptCache();
     if (cache.get(payload.requestId) !== 'sent') {
       GmailApp.sendEmail(recipient, 'SOLICITUD DE FACTURA ' + date.short, invoiceBody_(date), {
-        attachments: attachments,
+        attachments: [certificate, ticket],
         name: 'Einar Ulises Arenas Hernandez',
       });
       try { cache.put(payload.requestId, 'sent', 21600); } catch (cacheError) { /* El correo ya fue aceptado por Gmail. */ }
